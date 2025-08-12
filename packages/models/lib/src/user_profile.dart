@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// UserProfile model representing user information in the Nory Shop app
 class UserProfile {

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import 'address.dart';
 
 /// Order status representing the current state of an order
@@ -294,7 +294,7 @@ class Order {
     return other is Order &&
       other.id == id &&
       other.userId == userId &&
-      listEquals(other.items, items) &&
+      const ListEquality().equals(other.items, items) &&
       other.address == address &&
       other.subtotal == subtotal &&
       other.deliveryFee == deliveryFee &&
