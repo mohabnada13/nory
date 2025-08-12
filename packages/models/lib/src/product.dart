@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Product model representing bakery and sweet items in the Nory Shop app
 class Product {

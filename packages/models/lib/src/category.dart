@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Category model representing product categories in the Nory Shop app
 class Category {
