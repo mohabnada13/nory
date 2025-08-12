@@ -1,0 +1,32 @@
+{
+  "name": "nory-shop-functions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Firebase Cloud Functions for Nory Shop e-commerce app",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions",
+    "lint": "eslint .",
+    "dev": "npm run build && npm run serve"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.10.1",
+    "firebase-functions": "^4.5.0",
+    "axios": "^1.6.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1",
+    "@types/node": "^20.8.10",
+    "@types/cors": "^2.8.15",
+    "eslint": "^8.52.0",
+    "@typescript-eslint/parser": "^6.9.1",
+    "@typescript-eslint/eslint-plugin": "^6.9.1"
+  }
+}
