@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Promo model representing promotional codes in the Nory Shop app
 class Promo {

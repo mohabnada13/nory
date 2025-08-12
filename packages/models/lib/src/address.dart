@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Address model representing delivery addresses in the Nory Shop app
 class Address {
