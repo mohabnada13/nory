@@ -10,6 +10,8 @@ import 'firebase_options.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/auth/sign_in_screen.dart';
+// Services
+import 'services/notification_service.dart';
 
 // Brand colors
 class AppColors {
@@ -59,6 +61,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Initialize Firebase Cloud Messaging (notifications)
+  await NotificationService.initialize();
   
   runApp(
     const ProviderScope(
