@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 // import cors removed
 
 // Initialize Firebase Admin SDK
@@ -40,6 +42,47 @@ const getPaymobConfig = (): PaymobConfig => {
 const isUsingMockPaymob = (): boolean => {
   const config = getPaymobConfig();
   return config.apiKey === 'placeholder_api_key';
+};
+
+// ---------------------------------------------------------------------------
+// AWS S3 helpers
+// ---------------------------------------------------------------------------
+
+type AwsConfig = {
+  accessKeyId: string;
+  secretAccessKey: string;
+  region: string;
+  bucket: string;
+  basePath?: string; // e.g. 'Nor/'
+  publicRead?: boolean;
+};
+
+const getAwsConfig = (): AwsConfig => {
+  const c = functions.config();
+  return {
+    accessKeyId: c?.aws?.access_key_id || '',
+    secretAccessKey: c?.aws?.secret_access_key || '',
+    region: c?.aws?.region || 'eu-west-1',
+    bucket: c?.aws?.bucket || '',
+    basePath: c?.aws?.base_path || 'Nor/',
+    publicRead: c?.aws?.public_read === 'true',
+  };
+};
+
+const getS3Client = (): S3Client => {
+  const cfg = getAwsConfig();
+  if (!cfg.accessKeyId || !cfg.secretAccessKey || !cfg.bucket) {
+    throw new Error(
+      'AWS S3 is not configured. Set functions config: aws.access_key_id, aws.secret_access_key, aws.region, aws.bucket, aws.base_path'
+    );
+  }
+  return new S3Client({
+    region: cfg.region,
+    credentials: {
+      accessKeyId: cfg.accessKeyId,
+      secretAccessKey: cfg.secretAccessKey,
+    },
+  });
 };
 
 // Types for Paymob API requests/responses
@@ -153,7 +196,8 @@ export const createPaymobPayment = functions.https.onCall(async (data, context) 
     );
   }
   
-  const { amount, currency = 'EGP', orderId, method } = data;
+  // We ignore any client-supplied currency and force EGP downstream.
+  const { amount, orderId, method } = data;
   
   // Validate inputs
   if (!amount || amount <= 0) {
@@ -224,6 +268,67 @@ export const createPaymobPayment = functions.https.onCall(async (data, context) 
     throw new functions.https.HttpsError(
       'internal',
       'Failed to create payment. Please try again later.'
+    );
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 3. Create S3 Upload URL (HTTPS callable)
+// ---------------------------------------------------------------------------
+
+export const createS3UploadUrl = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Auth required.');
+  }
+
+  const { fileName, contentType } = data || {};
+  if (!fileName || !contentType) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'fileName and contentType are required.'
+    );
+  }
+
+  try {
+    const aws = getAwsConfig();
+    const s3 = getS3Client();
+
+    const userPrefix = `${context.auth.uid}/`;
+    const ts = Date.now();
+    const safeName = String(fileName).replace(/[^a-zA-Z0-9._-]/g, '_');
+    const key = `${aws.basePath ?? ''}${userPrefix}${ts}_${safeName}`;
+
+    // PUT presign for upload
+    const putCmd = new PutObjectCommand({
+      Bucket: aws.bucket,
+      Key: key,
+      ContentType: contentType,
+    });
+    const uploadUrl = await getSignedUrl(s3, putCmd, { expiresIn: 900 }); // 15 min
+
+    // GET presign for download (if not public)
+    const getCmd = new GetObjectCommand({
+      Bucket: aws.bucket,
+      Key: key,
+    });
+    const getUrl = await getSignedUrl(s3, getCmd, { expiresIn: 900 });
+
+    const publicUrl = aws.publicRead
+      ? `https://${aws.bucket}.s3.${aws.region}.amazonaws.com/${key}`
+      : undefined;
+
+    return {
+      success: true,
+      key,
+      uploadUrl,
+      getUrl,
+      publicUrl,
+    };
+  } catch (error) {
+    console.error('S3 presign error', error);
+    throw new functions.https.HttpsError(
+      'internal',
+      (error as any).message || 'Failed to create S3 upload URL'
     );
   }
 });
