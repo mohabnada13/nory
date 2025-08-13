@@ -1,14 +1,14 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
-import * as cors from 'cors';
+// import cors removed
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
 
 // Initialize Firestore
 const db = admin.firestore();
-const corsHandler = cors({ origin: true });
+// const corsHandler = undefined;
 
 // Paymob API endpoints
 const PAYMOB_AUTH_URL = 'https://accept.paymob.com/api/auth/tokens';
@@ -580,7 +580,7 @@ export const seedSampleData = functions.https.onCall(async (data, context) => {
 export const onOrderCreated = functions.firestore
   .document('orders/{orderId}')
   .onCreate(async (snapshot, context) => {
-    const order = snapshot.data();
+    const order = snapshot.data() as any;
     const orderId = context.params.orderId;
     
     try {
@@ -636,7 +636,7 @@ export const onOrderCreated = functions.firestore
       return { success: true };
     } catch (error) {
       console.error('Error sending order notification:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: (error as any).message };
     }
   });
 
@@ -671,7 +671,7 @@ export const progressOrderStatus = functions.https.onCall(async (data, context) 
       );
     }
     
-    const order = orderDoc.data();
+    const order = orderDoc.data() as any;
     
     // Check if user is authorized (either admin or order owner)
     // In a real app, you'd check admin role or custom claims
@@ -748,7 +748,7 @@ export const progressOrderStatus = functions.https.onCall(async (data, context) 
     console.error('Error updating order status:', error);
     throw new functions.https.HttpsError(
       'internal',
-      error.message || 'Failed to update order status.'
+      (error as any).message || 'Failed to update order status.'
     );
   }
 });

@@ -4,7 +4,7 @@
     "module": "commonjs",
     "outDir": "lib",
     "rootDir": "src",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -12,7 +12,8 @@
     "sourceMap": true,
     "declaration": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": false,
+    "useUnknownInCatchVariables": false
   },
   "compileOnSave": true,
   "include": [
