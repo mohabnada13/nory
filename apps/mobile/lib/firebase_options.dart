@@ -22,10 +22,11 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'placeholder-api-key',
-    appId: '1:000000000000:android:0000000000000000000000',
-    messagingSenderId: '000000000000',
-    projectId: 'placeholder-project',
-    storageBucket: 'placeholder-project.appspot.com',
+    apiKey: 'AIzaSyAblNtytVwVRgr7LlmfhJu2oM-9gBWrjfw',
+    appId: '1:201900119855:android:f3fe266f579e4cc76533da',
+    messagingSenderId: '201900119855',
+    projectId: 'nory-shop-dev',
+    storageBucket: 'nory-shop-dev.firebasestorage.app',
   );
+
 }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../categories/categories_screen.dart';
+import '../cart/cart_screen.dart';
+import '../orders/orders_screen.dart';
+import '../profile/profile_screen.dart';
 
 /// Home screen with bottom navigation for the main app sections
 class HomeScreen extends StatefulWidget {
@@ -30,16 +34,16 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildHomeTab(),
             
             // Categories Tab
-            _buildPlaceholderTab('Categories'),
+            const CategoriesScreen(),
             
             // Cart Tab
-            _buildPlaceholderTab('Cart'),
+            const CartScreen(),
             
             // Orders Tab
-            _buildPlaceholderTab('Orders'),
+            const OrdersScreen(),
             
             // Profile Tab
-            _buildPlaceholderTab('Profile'),
+            const ProfileScreen(),
           ],
         ),
       ),

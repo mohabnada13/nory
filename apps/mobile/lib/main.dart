@@ -10,6 +10,9 @@ import 'firebase_options.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/auth/sign_in_screen.dart';
+import 'features/checkout/checkout_screen.dart';
+import 'features/orders/orders_screen.dart';
+import 'features/address/address_form_screen.dart';
 
 // Brand colors
 class AppColors {
@@ -47,6 +50,18 @@ final _router = GoRouter(
     GoRoute(
       path: '/home',
       builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/checkout',
+      builder: (context, state) => const CheckoutScreen(),
+    ),
+    GoRoute(
+      path: '/orders',
+      builder: (context, state) => const OrdersScreen(),
+    ),
+    GoRoute(
+      path: '/address_form',
+      builder: (context, state) => const AddressFormScreen(),
     ),
   ],
 );

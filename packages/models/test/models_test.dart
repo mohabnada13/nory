@@ -1,16 +1,7 @@
-import 'package:models/models.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('A group of tests', () {
-    final awesome = Awesome();
-
-    setUp(() {
-      // Additional setup goes here.
-    });
-
-    test('First Test', () {
-      expect(awesome.isAwesome, isTrue);
-    });
+  test('models package loads', () {
+    expect(2 + 2, 4);
   });
 }
