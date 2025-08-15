@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+// New theme & reusable widgets
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/gradient_button.dart';
 
 /// Onboarding screen with 3 pages introducing the app features
 class OnboardingScreen extends StatefulWidget {
@@ -23,19 +27,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'title': 'Fresh Bakery',
       'description': 'Discover freshly baked goods delivered straight to your door',
       'icon': Icons.bakery_dining,
-      'color': const Color(0xFF8B5E3C),
+      'color': AppPalette.primaryStart,
     },
     {
       'title': 'Sweet Selection',
       'description': 'Explore our wide variety of pastries, cakes, and desserts',
       'icon': Icons.cake,
-      'color': const Color(0xFFD4AF37),
+      'color': AppPalette.primaryEnd,
     },
     {
       'title': 'Fast Delivery',
       'description': 'Order easily and enjoy quick delivery throughout Cairo',
       'icon': Icons.delivery_dining,
-      'color': const Color(0xFF8B5E3C),
+      'color': AppPalette.primaryStart,
     },
   ];
 
@@ -48,8 +52,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E7), // Cream background
-      body: SafeArea(
+      backgroundColor: Colors.transparent,
+      body: BackgroundGradient(
+        padding: const EdgeInsets.only(top: 8), // keep safe-area behaviour
         child: Column(
           children: [
             // Skip button (not shown on last page)
@@ -60,10 +65,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onPressed: () => context.go('/signin'),
                       child: Text(
                         'Skip',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF8B5E3C),
-                          fontWeight: FontWeight.w500,
-                        ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(
+                                  color: AppPalette.primaryStart,
+                                  fontWeight: FontWeight.w500,
+                                ),
                       ),
                     )
                   : const SizedBox(height: 48),
@@ -124,8 +132,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 240,
             height: 240,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(30),
+              color: AppPalette.accentLilac.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(32),
             ),
             child: Center(
               child: Icon(
@@ -140,11 +148,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Title
           Text(
             title,
-            style: GoogleFonts.poppins(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF8B5E3C),
-            ),
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppPalette.textPrimary,
+                ),
           ),
           const SizedBox(height: 16),
           
@@ -152,10 +159,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             description,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: AppPalette.textSecondary),
           ),
         ],
       ),
@@ -169,7 +176,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       height: isActive ? 12 : 8,
       width: isActive ? 12 : 8,
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFFD4AF37) : Colors.grey.shade400,
+        color: isActive
+            ? AppPalette.primaryStart
+            : Colors.white70,
         borderRadius: BorderRadius.circular(6),
       ),
     );
@@ -177,56 +186,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   // Get Started button for last page
   Widget _buildGetStartedButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: () => context.go('/signin'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF8B5E3C),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: Text(
-          'Get Started',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+    return GradientButton(
+      label: 'Get Started',
+      onPressed: () => context.go('/signin'),
+      borderRadius: 20,
     );
   }
 
   // Next button for non-last pages
   Widget _buildNextButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: () {
-          _pageController.nextPage(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeIn,
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF8B5E3C),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: Text(
-          'Next',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+    return GradientButton(
+      label: 'Next',
+      onPressed: () {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeIn,
+        );
+      },
+      borderRadius: 20,
     );
   }
 }

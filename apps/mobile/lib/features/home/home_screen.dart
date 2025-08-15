@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/glass_card.dart';
+import '../../ui/widgets/gradient_button.dart';
+
 import '../categories/categories_screen.dart';
 import '../cart/cart_screen.dart';
 import '../orders/orders_screen.dart';
@@ -17,16 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   // Current tab index
   int _currentIndex = 0;
 
-  // App brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: cream,
-      body: SafeArea(
+      backgroundColor: Colors.transparent,
+      body: BackgroundGradient(
+        addTopSafeArea: true,
         child: IndexedStack(
           index: _currentIndex,
           children: [
@@ -55,17 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: brown,
-        unselectedItemColor: Colors.grey,
-        selectedLabelStyle: GoogleFonts.poppins(
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
-        ),
-        unselectedLabelStyle: GoogleFonts.poppins(
-          fontWeight: FontWeight.w500,
-          fontSize: 12,
-        ),
+        backgroundColor: Colors.white.withOpacity(0.85),
+        selectedItemColor: AppPalette.primaryStart,
+        unselectedItemColor: Colors.black38,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -112,14 +105,14 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   'Nory Shop',
-                  style: GoogleFonts.poppins(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: brown,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.bold, color: AppPalette.textPrimary),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.notifications_outlined, color: brown),
+                  icon: const Icon(Icons.notifications_outlined,
+                      color: AppPalette.primaryStart),
                   onPressed: () {},
                 ),
               ],
@@ -131,27 +124,18 @@ class _HomeScreenState extends State<HomeScreen> {
           // Search Bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+            child: GlassCard(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              borderRadius: 16,
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Search for bakery items...',
-                  hintStyle: GoogleFonts.poppins(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  hintStyle: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: AppPalette.textSecondary),
+                  prefixIcon:
+                      const Icon(Icons.search, color: AppPalette.textSecondary),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -182,39 +166,42 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: 5,
                     itemBuilder: (context, index) {
-                      return Container(
-                        width: 280,
-                        margin: const EdgeInsets.only(right: 16),
-                        decoration: BoxDecoration(
-                          color: index % 2 == 0 ? brown.withOpacity(0.1) : gold.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.cake,
-                                size: 60,
-                                color: index % 2 == 0 ? brown : gold,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Featured Product ${index + 1}',
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w600,
-                                  color: brown,
-                                ),
-                              ),
-                              Text(
-                                'EGP ${(index + 1) * 25}.00',
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w500,
-                                  color: gold,
-                                ),
-                              ),
-                            ],
-                          ),
+                      return GlassCard(
+                        overlayColor: Colors.white.withOpacity(0.15),
+                        padding: const EdgeInsets.all(16),
+                        borderRadius: 20,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.cake,
+                              size: 60,
+                              color: index.isEven
+                                  ? AppPalette.primaryStart
+                                  : AppPalette.primaryEnd,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Featured Product ${index + 1}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              'EGP ${(index + 1) * 25}.00',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(color: AppPalette.primaryEnd),
+                            ),
+                            const SizedBox(height: 8),
+                            GradientButton(
+                              label: 'Start to Order',
+                              height: 44,
+                              onPressed: () {},
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -254,34 +241,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         Icons.breakfast_dining, Icons.bakery_dining, 
                         Icons.cake, Icons.cookie, Icons.emoji_food_beverage
                       ];
-                      return Container(
-                        width: 100,
-                        margin: const EdgeInsets.only(right: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
+                      return GlassCard(
+                        padding: const EdgeInsets.all(12),
+                        borderRadius: 16,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(icons[index], color: brown, size: 32),
+                            Icon(icons[index],
+                                color: AppPalette.primaryStart, size: 32),
                             const SizedBox(height: 8),
                             Text(
                               categories[index],
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: brown,
-                              ),
                               textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.labelMedium,
                             ),
                           ],
                         ),
@@ -321,19 +293,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   itemCount: 4,
                   itemBuilder: (context, index) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
+                    return GlassCard(
+                      borderRadius: 16,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -341,15 +302,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: index % 2 == 0 ? brown.withOpacity(0.1) : gold.withOpacity(0.1),
+                                color: AppPalette.accentLilac.withOpacity(0.6),
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                               ),
                               child: Center(
-                                child: Icon(
-                                  index % 2 == 0 ? Icons.bakery_dining : Icons.cake,
-                                  size: 40,
-                                  color: index % 2 == 0 ? brown : gold,
-                                ),
+                                child: Icon(Icons.bakery_dining,
+                                    size: 40, color: AppPalette.primaryStart),
                               ),
                             ),
                           ),
@@ -361,44 +319,26 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   'Trending Product ${index + 1}',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: brown,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.copyWith(fontWeight: FontWeight.w600),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   'EGP ${(index + 1) * 20}.00',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: gold,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.copyWith(color: AppPalette.primaryEnd),
                                 ),
                                 const SizedBox(height: 8),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: brown,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 8),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Add to Cart',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
+                                GradientButton(
+                                  label: 'Add to Cart',
+                                  height: 40,
+                                  onPressed: () {},
                                 ),
                               ],
                             ),
@@ -427,24 +367,23 @@ class _HomeScreenState extends State<HomeScreen> {
           Icon(
             Icons.construction,
             size: 64,
-            color: brown,
+            color: AppPalette.primaryStart,
           ),
           const SizedBox(height: 16),
           Text(
             '$tabName Tab',
-            style: GoogleFonts.poppins(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: brown,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Coming soon',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Colors.grey),
           ),
         ],
       ),
