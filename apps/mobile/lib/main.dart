@@ -15,6 +15,7 @@ import 'features/auth/sign_in_screen.dart';
 import 'features/checkout/checkout_screen.dart';
 import 'features/orders/orders_screen.dart';
 import 'features/address/address_form_screen.dart';
+import 'features/categories/product_details_screen.dart';
 
 // Router configuration - will be moved to router.dart later
 final _router = GoRouter(
@@ -35,6 +36,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/home',
       builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/product_details',
+      builder: (context, state) => const ProductDetailsScreen(),
     ),
     GoRoute(
       path: '/checkout',

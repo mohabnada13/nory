@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:models/models.dart';
 import '../../providers.dart';
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/glass_card.dart';
+import '../../ui/widgets/gradient_button.dart';
 
 /// Categories screen showing category selection and products grid
 class CategoriesScreen extends ConsumerStatefulWidget {
@@ -17,43 +20,39 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
   // Selected category ID
   String? _selectedCategoryId;
 
-  // App brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
-
   @override
   Widget build(BuildContext context) {
     // Watch categories stream
     final categoriesAsyncValue = ref.watch(categoriesProvider);
     
     return Scaffold(
-      backgroundColor: cream,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Categories',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
-            color: brown,
+            color: AppPalette.textPrimary,
           ),
         ),
-        backgroundColor: cream,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          // Categories horizontal list
-          _buildCategoriesList(categoriesAsyncValue),
-          
-          // Products grid for selected category
-          Expanded(
-            child: _selectedCategoryId == null
-                ? _buildSelectCategoryMessage()
-                : _buildProductsGrid(_selectedCategoryId!),
-          ),
-        ],
+      body: BackgroundGradient(
+        child: Column(
+          children: [
+            // Categories horizontal list
+            _buildCategoriesList(categoriesAsyncValue),
+            
+            // Products grid for selected category
+            Expanded(
+              child: _selectedCategoryId == null
+                  ? _buildSelectCategoryMessage()
+                  : _buildProductsGrid(_selectedCategoryId!),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -90,51 +89,45 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                 child: Container(
                   width: 100,
                   margin: const EdgeInsets.only(right: 12),
-                  decoration: BoxDecoration(
-                    color: isSelected ? brown : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: CachedNetworkImage(
-                          imageUrl: category.imageUrl,
-                          height: 50,
-                          width: 50,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.category, color: Colors.grey),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.error, color: Colors.grey),
+                  child: GlassCard(
+                    overlayColor: isSelected 
+                        ? AppPalette.primaryStart.withOpacity(0.15)
+                        : null,
+                    padding: const EdgeInsets.all(8),
+                    borderRadius: 16,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: CachedNetworkImage(
+                            imageUrl: category.imageUrl,
+                            height: 50,
+                            width: 50,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              color: Colors.grey.shade200,
+                              child: const Icon(Icons.category, color: Colors.grey),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: Colors.grey.shade200,
+                              child: const Icon(Icons.error, color: Colors.grey),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        category.name,
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: isSelected ? Colors.white : brown,
+                        const SizedBox(height: 8),
+                        Text(
+                          category.name,
+                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: isSelected ? AppPalette.primaryStart : AppPalette.textPrimary,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -146,7 +139,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         height: 120,
         child: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(brown),
+            valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
           ),
         ),
       ),
@@ -155,7 +148,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         child: Center(
           child: Text(
             'Error loading categories',
-            style: GoogleFonts.poppins(color: Colors.red),
+            style: TextStyle(color: Colors.red),
           ),
         ),
       ),
@@ -171,9 +164,8 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
           return Center(
             child: Text(
               'No products found in this category',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                color: Colors.grey,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppPalette.textSecondary,
               ),
             ),
           );
@@ -196,110 +188,101 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
           ),
         );
       },
-      loading: () => const Center(
+      loading: () => Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(brown),
+          valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
         ),
       ),
       error: (error, stackTrace) => Center(
         child: Text(
           'Error loading products',
-          style: GoogleFonts.poppins(color: Colors.red),
+          style: TextStyle(color: Colors.red),
         ),
       ),
     );
   }
 
   Widget _buildProductCard(Product product) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return GlassCard(
+      borderRadius: 16,
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product image
+          // Product image and title - clickable to go to details
           Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: CachedNetworkImage(
-                imageUrl: product.imageUrl,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey.shade200,
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(brown),
-                      strokeWidth: 2,
+            child: GestureDetector(
+              onTap: () => Navigator.pushNamed(
+                context,
+                '/product_details',
+                arguments: product,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product image
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: CachedNetworkImage(
+                        imageUrl: product.imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: AppPalette.accentLilac.withOpacity(0.3),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: AppPalette.accentLilac.withOpacity(0.3),
+                          child: Icon(Icons.bakery_dining, color: AppPalette.primaryStart, size: 40),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.bakery_dining, color: brown, size: 40),
-                ),
+                  
+                  // Product name and price
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.name,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppPalette.textPrimary,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'EGP ${product.priceEgp.toStringAsFixed(2)}',
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: AppPalette.primaryEnd,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
           
-          // Product details
+          // Add to cart button
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: brown,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'EGP ${product.priceEgp.toStringAsFixed(2)}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: gold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _addToCart(product),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: brown,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Add to Cart',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            child: GradientButton(
+              label: 'Add to Cart',
+              height: 40,
+              onPressed: () => _addToCart(product),
             ),
           ),
         ],
@@ -311,9 +294,8 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
     return Center(
       child: Text(
         'Select a category to view products',
-        style: GoogleFonts.poppins(
-          fontSize: 16,
-          color: Colors.grey,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: AppPalette.textSecondary,
         ),
       ),
     );
@@ -328,9 +310,11 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         SnackBar(
           content: Text(
             '${product.name} added to cart',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+            ),
           ),
-          backgroundColor: brown,
+          backgroundColor: AppPalette.primaryStart,
           duration: const Duration(seconds: 2),
         ),
       );
@@ -339,7 +323,9 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         SnackBar(
           content: Text(
             'Failed to add to cart: ${e.toString()}',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+            ),
           ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 2),

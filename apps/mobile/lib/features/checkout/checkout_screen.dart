@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:models/models.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../providers.dart';
 import '../../../data/repositories/cart_repository.dart';
 import '../../../data/repositories/order_repository.dart';
 import '../../../data/repositories/address_repository.dart';
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/gradient_button.dart';
+import '../../ui/widgets/glass_card.dart';
 
 /// Checkout screen for finalizing orders with address selection and payment
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -17,11 +20,6 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 }
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
-  // App brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
-
   // Selected address and payment method
   Address? _selectedAddress;
   PaymentMethod _selectedPaymentMethod = PaymentMethod.paymob_card;
@@ -54,69 +52,53 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: cream,
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: Text(
               'Checkout',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: brown,
+                color: AppPalette.textPrimary,
               ),
             ),
-            backgroundColor: cream,
+            backgroundColor: Colors.transparent,
             elevation: 0,
             centerTitle: true,
+            foregroundColor: AppPalette.textPrimary,
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Delivery Address Section
-                _buildSectionTitle('Delivery Address'),
-                const SizedBox(height: 12),
-                _buildAddressSection(addressesAsyncValue),
-                const SizedBox(height: 24),
-                
-                // Payment Method Section
-                _buildSectionTitle('Payment Method'),
-                const SizedBox(height: 12),
-                _buildPaymentMethodSection(),
-                const SizedBox(height: 24),
-                
-                // Order Summary Section
-                _buildSectionTitle('Order Summary'),
-                const SizedBox(height: 12),
-                _buildOrderSummary(subtotal, deliveryFee, discount, total, promoCode),
-                const SizedBox(height: 24),
-                
-                // Place Order Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
+          body: BackgroundGradient(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Delivery Address Section
+                  _buildSectionTitle('Delivery Address'),
+                  const SizedBox(height: 12),
+                  _buildAddressSection(addressesAsyncValue),
+                  const SizedBox(height: 24),
+                  
+                  // Payment Method Section
+                  _buildSectionTitle('Payment Method'),
+                  const SizedBox(height: 12),
+                  _buildPaymentMethodSection(),
+                  const SizedBox(height: 24),
+                  
+                  // Order Summary Section
+                  _buildSectionTitle('Order Summary'),
+                  const SizedBox(height: 12),
+                  _buildOrderSummary(subtotal, deliveryFee, discount, total, promoCode),
+                  const SizedBox(height: 24),
+                  
+                  // Place Order Button
+                  GradientButton(
+                    label: 'Place Order',
                     onPressed: _selectedAddress == null
                         ? null
                         : () => _placeOrder(subtotal, deliveryFee, discount, total, promoCode),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: brown,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      disabledBackgroundColor: Colors.grey.shade400,
-                    ),
-                    child: Text(
-                      'Place Order',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -125,9 +107,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         if (_isLoading)
           Container(
             color: Colors.black.withOpacity(0.5),
-            child: const Center(
+            child: Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(gold),
+                valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
               ),
             ),
           ),
@@ -138,10 +120,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
         fontWeight: FontWeight.bold,
-        color: brown,
+        color: AppPalette.textPrimary,
       ),
     );
   }
@@ -151,9 +132,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       stream: addressesStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(brown),
+              valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
             ),
           );
         }
@@ -163,7 +144,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             children: [
               Text(
                 'Error loading addresses: ${snapshot.error}',
-                style: GoogleFonts.poppins(color: Colors.red),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red),
               ),
               const SizedBox(height: 12),
               _buildAddAddressButton(),
@@ -205,35 +186,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Widget _buildNoAddressesMessage() {
     return Column(
       children: [
-        Container(
+        GlassCard(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
           child: Column(
             children: [
-              const Icon(
+              Icon(
                 Icons.location_off,
                 size: 48,
-                color: brown,
+                color: AppPalette.primaryStart,
               ),
               const SizedBox(height: 12),
               Text(
                 'No delivery addresses found',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: brown,
+                  color: AppPalette.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Please add a delivery address to continue',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: Colors.grey,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppPalette.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -255,17 +229,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           _selectedAddress = address;
         });
       },
-      child: Container(
+      child: GlassCard(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? brown : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
+        overlayColor: isSelected ? AppPalette.accentLilac.withOpacity(0.1) : null,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -278,7 +245,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   _selectedAddress = address;
                 });
               },
-              activeColor: brown,
+              activeColor: AppPalette.primaryStart,
             ),
             const SizedBox(width: 8),
             
@@ -292,10 +259,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       Expanded(
                         child: Text(
                           address.fullName,
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: brown,
+                            color: AppPalette.textPrimary,
                           ),
                         ),
                       ),
@@ -303,15 +269,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: gold.withOpacity(0.2),
+                            color: AppPalette.primaryEnd.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             'Default',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               fontWeight: FontWeight.w500,
-                              color: gold,
+                              color: AppPalette.primaryEnd,
                             ),
                           ),
                         ),
@@ -320,27 +285,24 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   const SizedBox(height: 4),
                   Text(
                     address.phone,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppPalette.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${address.building}, ${address.street}, ${address.area}, ${address.city}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppPalette.textSecondary,
                     ),
                   ),
                   if (address.notes.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       'Notes: ${address.notes}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontStyle: FontStyle.italic,
-                        color: Colors.grey.shade600,
+                        color: AppPalette.textSecondary,
                       ),
                     ),
                   ],
@@ -354,26 +316,25 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Widget _buildAddAddressButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () {
-          Navigator.pushNamed(context, '/address_form');
-        },
-        icon: const Icon(Icons.add, color: brown),
-        label: Text(
-          'Add New Address',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w500,
-            color: brown,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          side: const BorderSide(color: brown),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/address_form');
+      },
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add, color: AppPalette.primaryStart),
+            const SizedBox(width: 8),
+            Text(
+              'Add New Address',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: AppPalette.primaryStart,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -417,30 +378,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           _selectedPaymentMethod = method;
         });
       },
-      child: Container(
+      child: GlassCard(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? brown : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
+        overlayColor: isSelected ? AppPalette.accentLilac.withOpacity(0.1) : null,
         child: Column(
           children: [
             Icon(
               icon,
               size: 36,
-              color: isSelected ? brown : Colors.grey,
+              color: isSelected ? AppPalette.primaryStart : AppPalette.textSecondary,
             ),
             const SizedBox(height: 8),
             Text(
               title,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w500,
-                color: isSelected ? brown : Colors.grey.shade700,
+                color: isSelected ? AppPalette.primaryStart : AppPalette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -457,12 +410,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     double total,
     String? promoCode,
   ) {
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: Column(
         children: [
           _buildSummaryRow('Subtotal', 'EGP ${subtotal.toStringAsFixed(2)}'),
@@ -493,18 +442,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         children: [
           Text(
             label,
-            style: GoogleFonts.poppins(
-              fontSize: isTotal ? 16 : 14,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isTotal ? brown : Colors.grey.shade700,
+              color: isTotal ? AppPalette.primaryStart : AppPalette.textSecondary,
             ),
           ),
           Text(
             value,
-            style: GoogleFonts.poppins(
-              fontSize: isTotal ? 16 : 14,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isDiscount ? Colors.green : (isTotal ? brown : Colors.grey.shade700),
+              color: isDiscount ? Colors.green : (isTotal ? AppPalette.primaryStart : AppPalette.textSecondary),
             ),
           ),
         ],
@@ -524,7 +471,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         SnackBar(
           content: Text(
             'Please select a delivery address',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+            ),
           ),
           backgroundColor: Colors.red,
         ),
@@ -546,7 +495,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           SnackBar(
             content: Text(
               'Your cart is empty',
-              style: GoogleFonts.poppins(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+              ),
             ),
             backgroundColor: Colors.red,
           ),
@@ -607,7 +558,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             SnackBar(
               content: Text(
                 'Payment simulation: ${paymentResult['success'] ? 'Success' : 'Failed'}',
-                style: GoogleFonts.poppins(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                ),
               ),
               backgroundColor: paymentResult['success'] ? Colors.green : Colors.red,
             ),
@@ -632,7 +585,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           SnackBar(
             content: Text(
               'Wallet payment: Please check your phone for payment request',
-              style: GoogleFonts.poppins(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+              ),
             ),
             backgroundColor: Colors.blue,
           ),
@@ -656,7 +611,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         SnackBar(
           content: Text(
             'Failed to place order: ${e.toString()}',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+            ),
           ),
           backgroundColor: Colors.red,
         ),
@@ -720,27 +677,30 @@ class _PaymentWebViewState extends State<PaymentWebView> {
       appBar: AppBar(
         title: Text(
           'Payment',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w600,
+            color: AppPalette.textPrimary,
           ),
         ),
-        backgroundColor: const Color(0xFF8B5E3C),
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        foregroundColor: AppPalette.textPrimary,
+        elevation: 0,
       ),
-      body: Stack(
-        children: [
-          WebViewWidget(controller: _controller),
-          if (_isLoading)
-            Container(
-              color: Colors.white,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8B5E3C)),
+      body: BackgroundGradient(
+        child: Stack(
+          children: [
+            WebViewWidget(controller: _controller),
+            if (_isLoading)
+              Container(
+                color: Colors.white,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
+                  ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
