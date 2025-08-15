@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/glass_card.dart';
+import '../../ui/widgets/gradient_button.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -19,11 +22,6 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _isSigningIn = false;
   bool _isCreatingAccount = false;
   String? _errorMessage;
-
-  // Brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
 
   @override
   void dispose() {
@@ -140,265 +138,255 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: cream,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo and app name
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: brown,
-                    borderRadius: BorderRadius.circular(20),
+      backgroundColor: Colors.transparent,
+      body: BackgroundGradient(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo and app name
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      gradient: AppPalette.primaryGradient,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(
+                      Icons.cake,
+                      size: 60,
+                      color: Colors.white,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.cake,
-                    size: 60,
-                    color: Colors.white,
+                  const SizedBox(height: 24),
+                  Text(
+                    'Nory Shop',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppPalette.textPrimary,
+                        ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Nory Shop',
-                  style: GoogleFonts.poppins(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: brown,
+                  Text(
+                    'Bakery & Sweets',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppPalette.primaryEnd,
+                        ),
                   ),
-                ),
-                Text(
-                  'Bakery & Sweets',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: gold,
-                  ),
-                ),
-                const SizedBox(height: 48),
-                
-                // Sign in form
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      // Email field
-                      TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'Enter your email',
-                          prefixIcon: const Icon(Icons.email, color: brown),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: brown, width: 2),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!value.contains('@') || !value.contains('.')) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // Password field
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Enter your password',
-                          prefixIcon: const Icon(Icons.lock, color: brown),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: brown, width: 2),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          if (value.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
-                      ),
-                      
-                      // Error message
-                      if (_errorMessage != null) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          _errorMessage!,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Sign In button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isSigningIn ? null : _signInWithEmailPassword,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: brown,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
-                          child: _isSigningIn
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  'Sign In',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 16),
-                      
-                      // Sign Up button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: OutlinedButton(
-                          onPressed: _isCreatingAccount ? null : _createAccount,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: brown,
-                            side: const BorderSide(color: brown),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: _isCreatingAccount
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(
-                                    color: brown,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  'Create Account',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Divider
-                      Row(
+                  const SizedBox(height: 48),
+                  
+                  // Sign in form
+                  GlassCard(
+                    padding: const EdgeInsets.all(24),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
                         children: [
-                          const Expanded(child: Divider()),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'OR',
-                              style: GoogleFonts.poppins(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
+                          // Email field
+                          TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText: 'Email',
+                              hintText: 'Enter your email',
+                              prefixIcon: Icon(Icons.email, color: AppPalette.primaryStart),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            ),
-                          ),
-                          const Expanded(child: Divider()),
-                        ],
-                      ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      // Google Sign In button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _signInWithGoogle,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black87,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: Colors.grey.shade300),
-                            ),
-                            elevation: 1,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.black12),
-                                ),
-                                alignment: Alignment.center,
-                                child: const Text(
-                                  'G',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppPalette.primaryStart, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.7),
+                              labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppPalette.textSecondary,
                                   ),
+                              hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppPalette.textSecondary.withOpacity(0.7),
+                                  ),
+                            ),
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              if (!value.contains('@') || !value.contains('.')) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          // Password field
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              hintText: 'Enter your password',
+                              prefixIcon: Icon(Icons.lock, color: AppPalette.primaryStart),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(color: AppPalette.primaryStart, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white.withOpacity(0.7),
+                              labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppPalette.textSecondary,
+                                  ),
+                              hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppPalette.textSecondary.withOpacity(0.7),
+                                  ),
+                            ),
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              if (value.length < 6) {
+                                return 'Password must be at least 6 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                          
+                          // Error message
+                          if (_errorMessage != null) ...[
+                            const SizedBox(height: 16),
+                            Text(
+                              _errorMessage!,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.red,
+                                  ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                          
+                          const SizedBox(height: 24),
+                          
+                          // Sign In button
+                          GradientButton(
+                            label: 'Sign In',
+                            onPressed: _isSigningIn ? null : _signInWithEmailPassword,
+                            height: 50,
+                            isLoading: _isSigningIn,
+                          ),
+                          
+                          const SizedBox(height: 16),
+                          
+                          // Sign Up button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: OutlinedButton(
+                              onPressed: _isCreatingAccount ? null : _createAccount,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppPalette.primaryStart,
+                                side: BorderSide(color: AppPalette.primaryStart),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Sign in with Google',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                              child: _isCreatingAccount
+                                  ? SizedBox(
+                                      height: 24,
+                                      width: 24,
+                                      child: CircularProgressIndicator(
+                                        color: AppPalette.primaryStart,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Create Account',
+                                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppPalette.primaryStart,
+                                          ),
+                                    ),
+                            ),
+                          ),
+                          
+                          const SizedBox(height: 24),
+                          
+                          // Divider
+                          Row(
+                            children: [
+                              const Expanded(child: Divider()),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  'OR',
+                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                        color: AppPalette.textSecondary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                 ),
                               ),
+                              const Expanded(child: Divider()),
                             ],
                           ),
-                        ),
+                          
+                          const SizedBox(height: 24),
+                          
+                          // Google Sign In button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: _signInWithGoogle,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black87,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(color: Colors.grey.shade300),
+                                ),
+                                elevation: 1,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.black12),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      'G',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'Sign in with Google',
+                                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

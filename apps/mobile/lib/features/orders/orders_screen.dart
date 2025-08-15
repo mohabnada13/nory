@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:models/models.dart';
 import '../../providers.dart';
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/glass_card.dart';
 
 /// Orders screen showing the user's order history
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
-
-  // App brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,24 +17,24 @@ class OrdersScreen extends ConsumerWidget {
     final ordersAsyncValue = ref.watch(myOrdersProvider);
     
     return Scaffold(
-      backgroundColor: cream,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'My Orders',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: brown,
-          ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppPalette.textPrimary,
+              ),
         ),
-        backgroundColor: cream,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
-      body: ordersAsyncValue.when(
+      body: BackgroundGradient(
+        child: ordersAsyncValue.when(
         data: (orders) {
           if (orders.isEmpty) {
-            return _buildEmptyOrdersMessage();
+            return _buildEmptyOrdersMessage(context);
           }
           
           return ListView.builder(
@@ -48,7 +45,7 @@ class OrdersScreen extends ConsumerWidget {
         },
         loading: () => const Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(brown),
+            valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
           ),
         ),
         error: (error, stackTrace) => Center(
@@ -56,16 +53,17 @@ class OrdersScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               'Error loading orders: ${error.toString()}',
-              style: GoogleFonts.poppins(color: Colors.red),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red),
               textAlign: TextAlign.center,
             ),
           ),
         ),
       ),
+      ),
     );
   }
 
-  Widget _buildEmptyOrdersMessage() {
+  Widget _buildEmptyOrdersMessage(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -73,24 +71,22 @@ class OrdersScreen extends ConsumerWidget {
           const Icon(
             Icons.receipt_long_outlined,
             size: 80,
-            color: brown,
+            color: AppPalette.primaryStart,
           ),
           const SizedBox(height: 16),
           Text(
             'No orders yet',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: brown,
-            ),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppPalette.textPrimary,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             'Your order history will appear here',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppPalette.textSecondary,
+                ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -103,50 +99,32 @@ class OrdersScreen extends ConsumerWidget {
     
     return GestureDetector(
       onTap: () => _showOrderDetails(context, order),
-      child: Container(
+      child: GlassCard(
         margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Order header with ID and date
-            Container(
+            Padding(
               padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: brown,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: Text(
                       'Order #${order.id.substring(0, 8)}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppPalette.primaryStart,
+                          ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Text(
                     dateFormat.format(order.createdAt),
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.white.withOpacity(0.9),
-                    ),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppPalette.textSecondary,
+                        ),
                   ),
                 ],
               ),
@@ -164,18 +142,16 @@ class OrdersScreen extends ConsumerWidget {
                     children: [
                       Text(
                         '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.grey.shade700,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppPalette.textSecondary,
+                            ),
                       ),
                       Text(
                         'EGP ${order.total.toStringAsFixed(2)}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: gold,
-                        ),
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppPalette.primaryEnd,
+                            ),
                       ),
                     ],
                   ),
@@ -184,9 +160,9 @@ class OrdersScreen extends ConsumerWidget {
                   // Status chips
                   Row(
                     children: [
-                      _buildStatusChip(order.status),
+                      _buildStatusChip(context, order.status),
                       const SizedBox(width: 8),
-                      _buildPaymentStatusChip(order.paymentStatus),
+                      _buildPaymentStatusChip(context, order.paymentStatus),
                     ],
                   ),
                 ],
@@ -203,14 +179,13 @@ class OrdersScreen extends ConsumerWidget {
               child: TextButton(
                 onPressed: () => _showOrderDetails(context, order),
                 style: TextButton.styleFrom(
-                  foregroundColor: brown,
+                  foregroundColor: AppPalette.primaryStart,
                 ),
                 child: Text(
                   'View Details',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
               ),
             ),
@@ -220,7 +195,7 @@ class OrdersScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusChip(OrderStatus status) {
+  Widget _buildStatusChip(BuildContext context, OrderStatus status) {
     Color chipColor;
     IconData iconData;
     
@@ -261,18 +236,17 @@ class OrdersScreen extends ConsumerWidget {
           const SizedBox(width: 4),
           Text(
             _formatStatus(status.name),
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: chipColor,
-            ),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: chipColor,
+                ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentStatusChip(PaymentStatus status) {
+  Widget _buildPaymentStatusChip(BuildContext context, PaymentStatus status) {
     Color chipColor;
     IconData iconData;
     
@@ -309,11 +283,10 @@ class OrdersScreen extends ConsumerWidget {
           const SizedBox(width: 4),
           Text(
             _formatStatus(status.name),
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: chipColor,
-            ),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: chipColor,
+                ),
           ),
         ],
       ),
@@ -346,133 +319,125 @@ class OrderDetailsSheet extends StatelessWidget {
     required this.order,
   });
 
-  // App brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
-
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('MMMM d, yyyy • h:mm a');
     
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: cream,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Handle and title
-          Center(
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      child: BackgroundGradient(
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.85,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle and title
+              Center(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade400,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Order Details',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppPalette.textPrimary,
+                          ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'Order Details',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: brown,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          
-          // Order info
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Order #${order.id.substring(0, 8)}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: brown,
-                  ),
-                ),
-                Text(
-                  dateFormat.format(order.createdAt),
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Status tracker
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: _buildStatusTracker(order.status),
-          ),
-          
-          // Order content (scrollable)
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Order items
-                  _buildSectionTitle('Items'),
-                  const SizedBox(height: 8),
-                  ...order.items.map((item) => _buildOrderItem(item)),
-                  const SizedBox(height: 24),
-                  
-                  // Delivery address
-                  _buildSectionTitle('Delivery Address'),
-                  const SizedBox(height: 8),
-                  _buildAddressCard(order.address),
-                  const SizedBox(height: 24),
-                  
-                  // Payment information
-                  _buildSectionTitle('Payment Information'),
-                  const SizedBox(height: 8),
-                  _buildPaymentInfo(order),
-                  const SizedBox(height: 24),
-                  
-                  // Order summary
-                  _buildSectionTitle('Order Summary'),
-                  const SizedBox(height: 8),
-                  _buildOrderSummary(order),
-                  const SizedBox(height: 32),
-                ],
               ),
-            ),
+              const SizedBox(height: 8),
+              
+              // Order info
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Order #${order.id.substring(0, 8)}',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: AppPalette.textPrimary,
+                          ),
+                    ),
+                    Text(
+                      dateFormat.format(order.createdAt),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: AppPalette.textSecondary,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Status tracker
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: _buildStatusTracker(context, order.status),
+              ),
+              
+              // Order content (scrollable)
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Order items
+                      _buildSectionTitle(context, 'Items'),
+                      const SizedBox(height: 8),
+                      ...order.items.map((item) => _buildOrderItem(context, item)),
+                      const SizedBox(height: 24),
+                      
+                      // Delivery address
+                      _buildSectionTitle(context, 'Delivery Address'),
+                      const SizedBox(height: 8),
+                      _buildAddressCard(context, order.address),
+                      const SizedBox(height: 24),
+                      
+                      // Payment information
+                      _buildSectionTitle(context, 'Payment Information'),
+                      const SizedBox(height: 8),
+                      _buildPaymentInfo(context, order),
+                      const SizedBox(height: 24),
+                      
+                      // Order summary
+                      _buildSectionTitle(context, 'Order Summary'),
+                      const SizedBox(height: 8),
+                      _buildOrderSummary(context, order),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: brown,
-      ),
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppPalette.textPrimary,
+          ),
     );
   }
 
-  Widget _buildStatusTracker(OrderStatus currentStatus) {
+  Widget _buildStatusTracker(BuildContext context, OrderStatus currentStatus) {
     final List<Map<String, dynamic>> statuses = [
       {
         'status': OrderStatus.processing,
@@ -513,7 +478,7 @@ class OrderDetailsSheet extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: isActive ? brown : Colors.grey.shade300,
+                      color: isActive ? AppPalette.primaryStart : Colors.grey.shade300,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -525,11 +490,10 @@ class OrderDetailsSheet extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     statuses[index]['label'] as String,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                      color: isActive ? brown : Colors.grey,
-                    ),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                          color: isActive ? AppPalette.primaryStart : AppPalette.textSecondary,
+                        ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -541,7 +505,7 @@ class OrderDetailsSheet extends StatelessWidget {
                   child: Container(
                     height: 3,
                     color: isActive && index < currentIndex
-                        ? brown
+                        ? AppPalette.primaryStart
                         : Colors.grey.shade300,
                   ),
                 ),
@@ -552,14 +516,10 @@ class OrderDetailsSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderItem(OrderItem item) {
-    return Container(
+  Widget _buildOrderItem(BuildContext context, OrderItem item) {
+    return GlassCard(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -575,7 +535,7 @@ class OrderDetailsSheet extends StatelessWidget {
                 width: 60,
                 height: 60,
                 color: Colors.grey.shade200,
-                child: const Icon(Icons.bakery_dining, color: brown, size: 30),
+                child: Icon(Icons.bakery_dining, color: AppPalette.primaryStart, size: 30),
               ),
             ),
           ),
@@ -588,19 +548,17 @@ class OrderDetailsSheet extends StatelessWidget {
               children: [
                 Text(
                   item.name,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: brown,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppPalette.textPrimary,
+                      ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'EGP ${item.unitPrice.toStringAsFixed(2)} × ${item.quantity}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: Colors.grey.shade700,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppPalette.textSecondary,
+                      ),
                 ),
               ],
             ),
@@ -609,24 +567,19 @@ class OrderDetailsSheet extends StatelessWidget {
           // Line total
           Text(
             'EGP ${item.lineTotal.toStringAsFixed(2)}',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: gold,
-            ),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: AppPalette.primaryEnd,
+                ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAddressCard(Address address) {
-    return Container(
+  Widget _buildAddressCard(BuildContext context, Address address) {
+    return GlassCard(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -635,11 +588,10 @@ class OrderDetailsSheet extends StatelessWidget {
               Expanded(
                 child: Text(
                   address.fullName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: brown,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppPalette.textPrimary,
+                      ),
                 ),
               ),
             ],
@@ -647,28 +599,25 @@ class OrderDetailsSheet extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             address.phone,
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              color: Colors.grey.shade700,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppPalette.textSecondary,
+                ),
           ),
           const SizedBox(height: 4),
           Text(
             '${address.building}, ${address.street}, ${address.area}, ${address.city}',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              color: Colors.grey.shade700,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppPalette.textSecondary,
+                ),
           ),
           if (address.notes.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               'Notes: ${address.notes}',
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                fontStyle: FontStyle.italic,
-                color: Colors.grey.shade600,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontStyle: FontStyle.italic,
+                    color: AppPalette.textSecondary,
+                  ),
             ),
           ],
         ],
@@ -676,7 +625,7 @@ class OrderDetailsSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentInfo(Order order) {
+  Widget _buildPaymentInfo(BuildContext context, Order order) {
     String paymentMethodText;
     IconData paymentIcon;
     
@@ -709,12 +658,8 @@ class OrderDetailsSheet extends StatelessWidget {
         break;
     }
     
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: Row(
         children: [
           // Payment method
@@ -723,16 +668,15 @@ class OrderDetailsSheet extends StatelessWidget {
               children: [
                 Icon(
                   paymentIcon,
-                  color: brown,
+                  color: AppPalette.primaryStart,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   paymentMethodText,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: brown,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppPalette.primaryStart,
+                      ),
                 ),
               ],
             ),
@@ -744,14 +688,14 @@ class OrderDetailsSheet extends StatelessWidget {
             decoration: BoxDecoration(
               color: statusColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: statusColor.withOpacity(0.5)),
             ),
             child: Text(
               statusText,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: statusColor,
-              ),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: statusColor,
+                  ),
             ),
           ),
         ],
@@ -759,19 +703,16 @@ class OrderDetailsSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderSummary(Order order) {
-    return Container(
+  Widget _buildOrderSummary(BuildContext context, Order order) {
+    return GlassCard(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: Column(
         children: [
-          _buildSummaryRow('Subtotal', 'EGP ${order.subtotal.toStringAsFixed(2)}'),
-          _buildSummaryRow('Delivery Fee', 'EGP ${order.deliveryFee.toStringAsFixed(2)}'),
+          _buildSummaryRow(context, 'Subtotal', 'EGP ${order.subtotal.toStringAsFixed(2)}'),
+          _buildSummaryRow(context, 'Delivery Fee', 'EGP ${order.deliveryFee.toStringAsFixed(2)}'),
           if (order.discount > 0) ...[
             _buildSummaryRow(
+              context,
               order.promoCode != null ? 'Discount (${order.promoCode})' : 'Discount',
               '- EGP ${order.discount.toStringAsFixed(2)}',
               isDiscount: true,
@@ -779,6 +720,7 @@ class OrderDetailsSheet extends StatelessWidget {
           ],
           const Divider(height: 24),
           _buildSummaryRow(
+            context,
             'Total',
             'EGP ${order.total.toStringAsFixed(2)}',
             isTotal: true,
@@ -788,7 +730,7 @@ class OrderDetailsSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool isTotal = false, bool isDiscount = false}) {
+  Widget _buildSummaryRow(BuildContext context, String label, String value, {bool isTotal = false, bool isDiscount = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -796,19 +738,17 @@ class OrderDetailsSheet extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.poppins(
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isTotal ? brown : Colors.grey.shade700,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
+                  color: isTotal ? AppPalette.primaryStart : AppPalette.textSecondary,
+                ),
           ),
           Text(
             value,
-            style: GoogleFonts.poppins(
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isDiscount ? Colors.green : (isTotal ? brown : Colors.grey.shade700),
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
+                  color: isDiscount ? Colors.green : (isTotal ? AppPalette.primaryStart : AppPalette.textSecondary),
+                ),
           ),
         ],
       ),

@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../providers.dart';
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/glass_card.dart';
+import '../../ui/widgets/gradient_button.dart';
 
 /// Profile screen showing user information and account options
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
-
-  // App brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,23 +18,24 @@ class ProfileScreen extends ConsumerWidget {
     final currentUser = firebaseAuth.currentUser;
 
     return Scaffold(
-      backgroundColor: cream,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'My Profile',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: brown,
-          ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppPalette.textPrimary,
+              ),
         ),
-        backgroundColor: cream,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
-      body: currentUser == null
-          ? _buildSignedOutView(context)
-          : _buildProfileView(context, currentUser, firebaseAuth),
+      body: BackgroundGradient(
+        child: currentUser == null
+            ? _buildSignedOutView(context)
+            : _buildProfileView(context, currentUser, firebaseAuth),
+      ),
     );
   }
 
@@ -48,46 +47,31 @@ class ProfileScreen extends ConsumerWidget {
           const Icon(
             Icons.account_circle,
             size: 80,
-            color: brown,
+            color: AppPalette.primaryStart,
           ),
           const SizedBox(height: 16),
           Text(
             'Not Signed In',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: brown,
-            ),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppPalette.textPrimary,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             'Please sign in to view your profile',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppPalette.textSecondary,
+                ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
+          GradientButton(
+            label: 'Sign In',
+            width: 200,
             onPressed: () {
-              Navigator.pushNamed(context, '/sign_in');
+              Navigator.pushNamed(context, '/signin');
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: brown,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'Sign In',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ),
         ],
       ),
@@ -101,11 +85,11 @@ class ProfileScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // User info card
-          _buildUserInfoCard(user),
+          _buildUserInfoCard(context, user),
           const SizedBox(height: 24),
 
           // Account options
-          _buildSectionTitle('Account'),
+          _buildSectionTitle(context, 'Account'),
           const SizedBox(height: 12),
           _buildMenuOption(
             context,
@@ -122,7 +106,7 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // App options
-          _buildSectionTitle('App Settings'),
+          _buildSectionTitle(context, 'App Settings'),
           const SizedBox(height: 12),
           _buildMenuOption(
             context,
@@ -133,7 +117,9 @@ class ProfileScreen extends ConsumerWidget {
                 SnackBar(
                   content: Text(
                     'Notification settings coming soon',
-                    style: GoogleFonts.poppins(),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                        ),
                   ),
                 ),
               );
@@ -148,7 +134,9 @@ class ProfileScreen extends ConsumerWidget {
                 SnackBar(
                   content: Text(
                     'Support options coming soon',
-                    style: GoogleFonts.poppins(),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                        ),
                   ),
                 ),
               );
@@ -164,9 +152,10 @@ class ProfileScreen extends ConsumerWidget {
               icon: const Icon(Icons.logout),
               label: Text(
                 'Sign Out',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w500,
-                ),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade400,
@@ -183,21 +172,9 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserInfoCard(User user) {
-    return Container(
+  Widget _buildUserInfoCard(BuildContext context, User user) {
+    return GlassCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           // Profile image
@@ -205,7 +182,7 @@ class ProfileScreen extends ConsumerWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: brown.withOpacity(0.1),
+              color: AppPalette.primaryStart.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: user.photoURL != null
@@ -214,17 +191,17 @@ class ProfileScreen extends ConsumerWidget {
                     child: Image.network(
                       user.photoURL!,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
+                      errorBuilder: (context, error, stackTrace) => Icon(
                         Icons.person,
                         size: 40,
-                        color: brown,
+                        color: AppPalette.primaryStart,
                       ),
                     ),
                   )
-                : const Icon(
+                : Icon(
                     Icons.person,
                     size: 40,
-                    color: brown,
+                    color: AppPalette.primaryStart,
                   ),
           ),
           const SizedBox(width: 16),
@@ -236,21 +213,19 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 Text(
                   user.displayName ?? 'Nory Shop User',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: brown,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppPalette.textPrimary,
+                      ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   user.email ?? 'No email provided',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppPalette.textSecondary,
+                      ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -258,10 +233,9 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     user.phoneNumber!,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
-                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppPalette.textSecondary,
+                        ),
                   ),
                 ],
               ],
@@ -272,14 +246,13 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: brown,
-      ),
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppPalette.textPrimary,
+          ),
     );
   }
 
@@ -289,21 +262,16 @@ class ProfileScreen extends ConsumerWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    return Container(
+    return GlassCard(
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
       child: ListTile(
-        leading: Icon(icon, color: brown),
+        leading: Icon(icon, color: AppPalette.primaryStart),
         title: Text(
           title,
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey.shade800,
-          ),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: AppPalette.textPrimary,
+              ),
         ),
         trailing: const Icon(
           Icons.arrow_forward_ios,
@@ -321,21 +289,23 @@ class ProfileScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: Text(
           'Sign Out',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            color: brown,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppPalette.primaryStart,
+              ),
         ),
         content: Text(
           'Are you sure you want to sign out?',
-          style: GoogleFonts.poppins(),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: GoogleFonts.poppins(color: Colors.grey),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: Colors.grey,
+                  ),
             ),
           ),
           ElevatedButton(
@@ -348,7 +318,9 @@ class ProfileScreen extends ConsumerWidget {
                     SnackBar(
                       content: Text(
                         'Signed out successfully',
-                        style: GoogleFonts.poppins(),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.white,
+                            ),
                       ),
                       backgroundColor: Colors.green,
                     ),
@@ -360,7 +332,9 @@ class ProfileScreen extends ConsumerWidget {
                     SnackBar(
                       content: Text(
                         'Error signing out: ${e.toString()}',
-                        style: GoogleFonts.poppins(),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.white,
+                            ),
                       ),
                       backgroundColor: Colors.red,
                     ),
@@ -374,7 +348,9 @@ class ProfileScreen extends ConsumerWidget {
             ),
             child: Text(
               'Sign Out',
-              style: GoogleFonts.poppins(),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: Colors.white,
+                  ),
             ),
           ),
         ],
