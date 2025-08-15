@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:models/models.dart';
 import '../../providers.dart';
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/glass_card.dart';
+import '../../ui/widgets/gradient_button.dart';
 
 /// Screen for adding or editing a delivery address
 class AddressFormScreen extends ConsumerStatefulWidget {
@@ -16,11 +19,6 @@ class AddressFormScreen extends ConsumerStatefulWidget {
 }
 
 class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
-  // App brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
-
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
 
@@ -72,233 +70,216 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: cream,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           widget.address == null ? 'Add New Address' : 'Edit Address',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: brown,
-          ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppPalette.textPrimary,
+              ),
         ),
-        backgroundColor: cream,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Contact Information
-                  _buildSectionTitle('Contact Information'),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    controller: _fullNameController,
-                    label: 'Full Name',
-                    hint: 'Enter your full name',
-                    icon: Icons.person_outline,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your full name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _phoneController,
-                    label: 'Phone Number',
-                    hint: 'Enter your phone number',
-                    icon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Address Details
-                  _buildSectionTitle('Address Details'),
-                  const SizedBox(height: 12),
-                  _buildTextField(
-                    controller: _cityController,
-                    label: 'City',
-                    hint: 'Enter city name',
-                    icon: Icons.location_city_outlined,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter city name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _areaController,
-                    label: 'Area/District',
-                    hint: 'Enter area or district',
-                    icon: Icons.map_outlined,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter area or district';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _streetController,
-                    label: 'Street',
-                    hint: 'Enter street name/number',
-                    icon: Icons.add_road_outlined,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter street name/number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _buildingController,
-                    label: 'Building',
-                    hint: 'Enter building name/number',
-                    icon: Icons.home_outlined,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter building name/number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _apartmentController,
-                    label: 'Apartment',
-                    hint: 'Enter apartment/unit number',
-                    icon: Icons.apartment_outlined,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter apartment/unit number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _notesController,
-                    label: 'Delivery Notes (Optional)',
-                    hint: 'Additional instructions for delivery',
-                    icon: Icons.note_outlined,
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Default Address Switch
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Set as Default Address',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: brown,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'This address will be selected by default during checkout',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                            ],
+      body: BackgroundGradient(
+        child: Stack(
+          children: [
+            Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Contact Information
+                    _buildSectionTitle('Contact Information'),
+                    const SizedBox(height: 12),
+                    GlassCard(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          _buildTextField(
+                            controller: _fullNameController,
+                            label: 'Full Name',
+                            hint: 'Enter your full name',
+                            icon: Icons.person_outline,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your full name';
+                              }
+                              return null;
+                            },
                           ),
-                        ),
-                        Switch(
-                          value: _isDefault,
-                          onChanged: (value) {
-                            setState(() {
-                              _isDefault = value;
-                            });
-                          },
-                          activeColor: brown,
-                          activeTrackColor: gold.withOpacity(0.5),
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _phoneController,
+                            label: 'Phone Number',
+                            hint: 'Enter your phone number',
+                            icon: Icons.phone_outlined,
+                            keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your phone number';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
-                  // Save Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveAddress,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: brown,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        disabledBackgroundColor: Colors.grey.shade400,
-                      ),
-                      child: Text(
-                        'Save Address',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    // Address Details
+                    _buildSectionTitle('Address Details'),
+                    const SizedBox(height: 12),
+                    GlassCard(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          _buildTextField(
+                            controller: _cityController,
+                            label: 'City',
+                            hint: 'Enter city name',
+                            icon: Icons.location_city_outlined,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter city name';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _areaController,
+                            label: 'Area/District',
+                            hint: 'Enter area or district',
+                            icon: Icons.map_outlined,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter area or district';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _streetController,
+                            label: 'Street',
+                            hint: 'Enter street name/number',
+                            icon: Icons.add_road_outlined,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter street name/number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _buildingController,
+                            label: 'Building',
+                            hint: 'Enter building name/number',
+                            icon: Icons.home_outlined,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter building name/number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _apartmentController,
+                            label: 'Apartment',
+                            hint: 'Enter apartment/unit number',
+                            icon: Icons.apartment_outlined,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter apartment/unit number';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _notesController,
+                            label: 'Delivery Notes (Optional)',
+                            hint: 'Additional instructions for delivery',
+                            icon: Icons.note_outlined,
+                            maxLines: 3,
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-          
-          // Loading overlay
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.5),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(gold),
+                    const SizedBox(height: 24),
+
+                    // Default Address Switch
+                    GlassCard(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Set as Default Address',
+                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: AppPalette.textPrimary,
+                                      ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'This address will be selected by default during checkout',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppPalette.textSecondary,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Switch(
+                            value: _isDefault,
+                            onChanged: (value) {
+                              setState(() {
+                                _isDefault = value;
+                              });
+                            },
+                            activeColor: AppPalette.primaryStart,
+                            activeTrackColor: AppPalette.primaryEnd.withOpacity(0.5),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Save Button
+                    GradientButton(
+                      label: 'Save Address',
+                      onPressed: _isLoading ? null : _saveAddress,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
             ),
-        ],
+            
+            // Loading overlay
+            if (_isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -306,11 +287,10 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: brown,
-      ),
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppPalette.textPrimary,
+          ),
     );
   }
 
@@ -323,39 +303,38 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hint,
-          prefixIcon: Icon(icon, color: brown),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          labelStyle: GoogleFonts.poppins(
-            color: Colors.grey.shade700,
-          ),
-          hintStyle: GoogleFonts.poppins(
-            color: Colors.grey,
-          ),
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        prefixIcon: Icon(icon, color: AppPalette.primaryStart),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
-        style: GoogleFonts.poppins(),
-        keyboardType: keyboardType,
-        maxLines: maxLines,
-        validator: validator,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppPalette.primaryStart, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppPalette.textSecondary,
+            ),
+        hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppPalette.textSecondary.withOpacity(0.7),
+            ),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.7),
       ),
+      style: Theme.of(context).textTheme.bodyMedium,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      validator: validator,
     );
   }
 
@@ -403,7 +382,9 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
             SnackBar(
               content: Text(
                 'Error saving address: ${e.toString()}',
-                style: GoogleFonts.poppins(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
+                    ),
               ),
               backgroundColor: Colors.red,
             ),

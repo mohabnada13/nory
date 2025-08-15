@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:models/models.dart';
 import '../../providers.dart';
 import '../../data/repositories/promo_repository.dart';
+import '../../ui/theme/app_theme.dart';
+import '../../ui/widgets/background_gradient.dart';
+import '../../ui/widgets/glass_card.dart';
+import '../../ui/widgets/gradient_button.dart';
 
 /// Cart screen showing items in the user's cart and checkout options
 class CartScreen extends ConsumerStatefulWidget {
@@ -14,10 +17,6 @@ class CartScreen extends ConsumerStatefulWidget {
 }
 
 class _CartScreenState extends ConsumerState<CartScreen> {
-  // App brand colors
-  static const Color cream = Color(0xFFFFF8E7);
-  static const Color brown = Color(0xFF8B5E3C);
-  static const Color gold = Color(0xFFD4AF37);
   
   // Fixed delivery fee
   static const double deliveryFee = 50.0;
@@ -46,29 +45,29 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final subtotalAsyncValue = ref.watch(cartSubtotalProvider);
     
     return Scaffold(
-      backgroundColor: cream,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Text(
           'Shopping Cart',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: brown,
-          ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppPalette.textPrimary,
+              ),
         ),
-        backgroundColor: cream,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         actions: [
           // Clear cart button
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: brown),
+            icon: const Icon(Icons.delete_outline, color: AppPalette.primaryStart),
             onPressed: _clearCart,
             tooltip: 'Clear Cart',
           ),
         ],
       ),
-      body: cartItemsAsyncValue.when(
+      body: BackgroundGradient(
+        child: cartItemsAsyncValue.when(
         data: (items) {
           if (items.isEmpty) {
             return _buildEmptyCart();
@@ -92,15 +91,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         },
         loading: () => const Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(brown),
+            valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
           ),
         ),
         error: (error, stackTrace) => Center(
           child: Text(
             'Error loading cart: ${error.toString()}',
-            style: GoogleFonts.poppins(color: Colors.red),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red),
             textAlign: TextAlign.center,
           ),
+        ),
         ),
       ),
     );
@@ -114,46 +114,28 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           const Icon(
             Icons.shopping_cart_outlined,
             size: 80,
-            color: brown,
+            color: AppPalette.primaryStart,
           ),
           const SizedBox(height: 16),
           Text(
             'Your cart is empty',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: brown,
-            ),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppPalette.textPrimary,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             'Add some delicious items to get started',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppPalette.textSecondary,
+                ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              // Navigate back to home or categories
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: brown,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'Browse Products',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          GradientButton(
+            label: 'Browse Products',
+            onPressed: () => Navigator.pop(context),
+            width: 200,
           ),
         ],
       ),
@@ -161,21 +143,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   }
 
   Widget _buildCartItem(OrderItem item) {
-    return Container(
+    return GlassCard(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -191,7 +161,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 width: 80,
                 height: 80,
                 color: Colors.grey.shade200,
-                child: const Icon(Icons.bakery_dining, color: brown, size: 40),
+                child: Icon(Icons.bakery_dining, color: AppPalette.primaryStart, size: 40),
               ),
             ),
           ),
@@ -204,10 +174,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               children: [
                 Text(
                   item.name,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: brown,
+                    color: AppPalette.textPrimary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -215,19 +184,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 const SizedBox(height: 4),
                 Text(
                   'EGP ${item.unitPrice.toStringAsFixed(2)}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: AppPalette.primaryEnd,
                     fontWeight: FontWeight.w500,
-                    color: gold,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Total: EGP ${item.lineTotal.toStringAsFixed(2)}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade700,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppPalette.textSecondary,
                   ),
                 ),
               ],
@@ -249,7 +215,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               // Quantity controls
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: AppPalette.primaryStart.withOpacity(0.25)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -259,7 +225,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       onTap: () => _updateQuantity(item.productId, item.quantity - 1),
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        child: const Icon(Icons.remove, size: 16, color: brown),
+                        child: Icon(Icons.remove, size: 16, color: AppPalette.primaryStart),
                       ),
                     ),
                     // Quantity
@@ -267,10 +233,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       child: Text(
                         '${item.quantity}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
                     // Increase quantity
@@ -278,7 +241,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       onTap: () => _updateQuantity(item.productId, item.quantity + 1),
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        child: const Icon(Icons.add, size: 16, color: brown),
+                        child: Icon(Icons.add, size: 16, color: AppPalette.primaryStart),
                       ),
                     ),
                   ],
@@ -292,31 +255,18 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   }
 
   Widget _buildOrderSummary(List<OrderItem> items, AsyncValue<double> subtotalAsyncValue) {
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Promo code input
           Text(
             'Promo Code',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: brown,
-            ),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppPalette.textPrimary,
+                ),
           ),
           const SizedBox(height: 8),
           Row(
@@ -326,9 +276,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   controller: _promoController,
                   decoration: InputDecoration(
                     hintText: 'Enter promo code',
-                    hintStyle: GoogleFonts.poppins(
-                      color: Colors.grey,
-                      fontSize: 14,
+                    hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppPalette.textSecondary,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -340,22 +289,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              ElevatedButton(
+              GradientButton(
+                label: 'Apply',
+                height: 44,
+                width: 90,
                 onPressed: _applyPromoCode,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: gold,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  'Apply',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
               ),
             ],
           ),
@@ -364,11 +302,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           // Order summary
           Text(
             'Order Summary',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: brown,
-            ),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppPalette.textPrimary,
+                ),
           ),
           const SizedBox(height: 8),
           
@@ -393,39 +330,21 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   const SizedBox(height: 16),
                   
                   // Checkout button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: items.isEmpty ? null : () => _proceedToCheckout(subtotal, total),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: brown,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        disabledBackgroundColor: Colors.grey.shade400,
-                      ),
-                      child: Text(
-                        'Proceed to Checkout',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+                  GradientButton(
+                    label: 'Proceed to Checkout',
+                    onPressed: items.isEmpty ? null : () => _proceedToCheckout(subtotal, total),
                   ),
                 ],
               );
             },
             loading: () => const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(brown),
+                valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
               ),
             ),
             error: (error, stackTrace) => Text(
               'Error calculating total: ${error.toString()}',
-              style: GoogleFonts.poppins(color: Colors.red),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red),
             ),
           ),
         ],
@@ -441,18 +360,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         children: [
           Text(
             label,
-            style: GoogleFonts.poppins(
-              fontSize: isTotal ? 16 : 14,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isTotal ? brown : Colors.grey.shade700,
+              color: isTotal ? AppPalette.primaryStart : AppPalette.textSecondary,
             ),
           ),
           Text(
             value,
-            style: GoogleFonts.poppins(
-              fontSize: isTotal ? 16 : 14,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isDiscount ? Colors.green : (isTotal ? brown : Colors.grey.shade700),
+              color: isDiscount ? Colors.green : (isTotal ? AppPalette.primaryStart : AppPalette.textSecondary),
             ),
           ),
         ],
@@ -474,7 +391,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         SnackBar(
           content: Text(
             'Failed to update quantity: ${e.toString()}',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
           backgroundColor: Colors.red,
         ),
@@ -491,7 +408,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         SnackBar(
           content: Text(
             'Failed to remove item: ${e.toString()}',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
           backgroundColor: Colors.red,
         ),
@@ -505,21 +422,21 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       builder: (context) => AlertDialog(
         title: Text(
           'Clear Cart',
-          style: GoogleFonts.poppins(
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            color: brown,
+            color: AppPalette.primaryStart,
           ),
         ),
         content: Text(
           'Are you sure you want to remove all items from your cart?',
-          style: GoogleFonts.poppins(),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: GoogleFonts.poppins(color: Colors.grey),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.grey),
             ),
           ),
           ElevatedButton(
@@ -540,7 +457,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   SnackBar(
                     content: Text(
                       'Failed to clear cart: ${e.toString()}',
-                      style: GoogleFonts.poppins(),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
                     ),
                     backgroundColor: Colors.red,
                   ),
@@ -553,7 +470,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             ),
             child: Text(
               'Clear',
-              style: GoogleFonts.poppins(),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white),
             ),
           ),
         ],
@@ -568,7 +485,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         SnackBar(
           content: Text(
             'Please enter a promo code',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
           backgroundColor: Colors.grey,
         ),
@@ -585,7 +502,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           SnackBar(
             content: Text(
               'Add items to your cart first',
-              style: GoogleFonts.poppins(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
             ),
             backgroundColor: Colors.grey,
           ),
@@ -600,7 +517,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           SnackBar(
             content: Text(
               'Invalid or expired promo code',
-              style: GoogleFonts.poppins(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
             ),
             backgroundColor: Colors.red,
           ),
@@ -614,7 +531,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           SnackBar(
             content: Text(
               'This promo code has expired',
-              style: GoogleFonts.poppins(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
             ),
             backgroundColor: Colors.red,
           ),
@@ -628,7 +545,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           SnackBar(
             content: Text(
               'Minimum order of EGP ${promo.minOrder.toStringAsFixed(2)} required for this promo',
-              style: GoogleFonts.poppins(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
             ),
             backgroundColor: Colors.red,
           ),
@@ -648,7 +565,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         SnackBar(
           content: Text(
             'Promo code applied: EGP ${discount.toStringAsFixed(2)} discount',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
           backgroundColor: Colors.green,
         ),
@@ -658,7 +575,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         SnackBar(
           content: Text(
             'Failed to apply promo code: ${e.toString()}',
-            style: GoogleFonts.poppins(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
           backgroundColor: Colors.red,
         ),
