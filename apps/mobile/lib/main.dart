@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'ui/theme/app_theme.dart';
@@ -153,8 +152,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
             ),
           ],
-        ),
-      ),
+          ),
+        ),   // <- closes Center
+      ),     // <- closes BackgroundGradient
     );
   }
 }

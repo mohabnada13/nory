@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:models/models.dart';
 import '../../providers.dart';
-import '../../data/repositories/promo_repository.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/widgets/background_gradient.dart';
 import '../../ui/widgets/glass_card.dart';
@@ -143,10 +142,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   }
 
   Widget _buildCartItem(OrderItem item) {
-    return GlassCard(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      child: Row(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: GlassCard(
+        padding: const EdgeInsets.all(12),
+        child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Product image
@@ -251,7 +251,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildOrderSummary(List<OrderItem> items, AsyncValue<double> subtotalAsyncValue) {

@@ -3,9 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:models/models.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../providers.dart';
-import '../../../data/repositories/cart_repository.dart';
-import '../../../data/repositories/order_repository.dart';
-import '../../../data/repositories/address_repository.dart';
 import '../../ui/theme/app_theme.dart';
 import '../../ui/widgets/background_gradient.dart';
 import '../../ui/widgets/gradient_button.dart';
@@ -229,11 +226,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           _selectedAddress = address;
         });
       },
-      child: GlassCard(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        overlayColor: isSelected ? AppPalette.accentLilac.withOpacity(0.1) : null,
-        child: Row(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: GlassCard(
+          padding: const EdgeInsets.all(16),
+          overlayColor: isSelected ? AppPalette.accentLilac.withOpacity(0.1) : null,
+          child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Radio button
@@ -312,7 +310,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildAddAddressButton() {
@@ -443,16 +442,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isTotal ? AppPalette.primaryStart : AppPalette.textSecondary,
-            ),
+                  fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
+                  color: isTotal
+                      ? AppPalette.primaryStart
+                      : AppPalette.textSecondary,
+                ),
           ),
           Text(
             value,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isDiscount ? Colors.green : (isTotal ? AppPalette.primaryStart : AppPalette.textSecondary),
-            ),
+                  fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
+                  color: isDiscount
+                      ? Colors.green
+                      : (isTotal
+                          ? AppPalette.primaryStart
+                          : AppPalette.textSecondary),
+                ),
           ),
         ],
       ),
