@@ -234,18 +234,54 @@ class ProductDetailsScreen extends ConsumerWidget {
     );
   }
   
-  void _addToCart(BuildContext context, WidgetRef ref, Product product) {
+  /// Adds the product to cart.
+  ///
+  /// 1. Ensures the user is authenticated.
+  /// 2. Awaits Firestore write to guarantee consistency.
+  /// 3. Shows appropriate success / error feedback.
+  Future<void> _addToCart(
+    BuildContext context,
+    WidgetRef ref,
+    Product product,
+  ) async {
+    final auth = ref.read(firebaseAuthProvider);
+
+    // Require sign-in first
+    if (auth.currentUser == null) {
+      final goSignIn = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Sign in required'),
+          content: const Text('Please sign in to add items to your cart.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Sign In'),
+            ),
+          ],
+        ),
+      );
+
+      if (goSignIn == true && context.mounted) {
+        Navigator.pushNamed(context, '/signin');
+      }
+      return;
+    }
+
     try {
-      final cartRepository = ref.read(cartRepositoryProvider);
-      cartRepository.addToCart(product);
-      
+      await ref.read(cartRepositoryProvider).addToCart(product);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             '${product.name} added to cart',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Colors.white),
           ),
           backgroundColor: AppPalette.primaryStart,
           duration: const Duration(seconds: 2),
@@ -256,9 +292,10 @@ class ProductDetailsScreen extends ConsumerWidget {
         SnackBar(
           content: Text(
             'Failed to add to cart: ${e.toString()}',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white,
-            ),
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Colors.white),
           ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 2),

@@ -222,24 +222,27 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
                 children: [
                   // Product image
                   Expanded(
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                      child: CachedNetworkImage(
-                        imageUrl: product.imageUrl,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: AppPalette.accentLilac.withOpacity(0.3),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
-                              strokeWidth: 2,
+                    child: Hero(
+                      tag: 'product-${product.id}',
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        child: CachedNetworkImage(
+                          imageUrl: product.imageUrl,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: AppPalette.accentLilac.withOpacity(0.3),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
+                                strokeWidth: 2,
+                              ),
                             ),
                           ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: AppPalette.accentLilac.withOpacity(0.3),
-                          child: Icon(Icons.bakery_dining, color: AppPalette.primaryStart, size: 40),
+                          errorWidget: (context, url, error) => Container(
+                            color: AppPalette.accentLilac.withOpacity(0.3),
+                            child: Icon(Icons.bakery_dining, color: AppPalette.primaryStart, size: 40),
+                          ),
                         ),
                       ),
                     ),
@@ -301,18 +304,42 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
     );
   }
 
-  void _addToCart(Product product) {
+  Future<void> _addToCart(Product product) async {
+    final auth = ref.read(firebaseAuthProvider);
+
+    // Prompt sign-in if the user is not authenticated
+    if (auth.currentUser == null) {
+      final goSignIn = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Sign in required'),
+          content: const Text('Please sign in to add items to your cart.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Sign In'),
+            ),
+          ],
+        ),
+      );
+
+      if (goSignIn == true && context.mounted) {
+        Navigator.pushNamed(context, '/signin');
+      }
+      return;
+    }
+
     try {
-      final cartRepository = ref.read(cartRepositoryProvider);
-      cartRepository.addToCart(product);
-      
+      await ref.read(cartRepositoryProvider).addToCart(product);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             '${product.name} added to cart',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
           backgroundColor: AppPalette.primaryStart,
           duration: const Duration(seconds: 2),
@@ -323,9 +350,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen> {
         SnackBar(
           content: Text(
             'Failed to add to cart: ${e.toString()}',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 2),

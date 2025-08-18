@@ -585,17 +585,52 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   }
 
   void _proceedToCheckout(double subtotal, double total) {
-    // Navigate to checkout screen with order details
-    Navigator.pushNamed(
-      context,
-      '/checkout',
-      arguments: {
-        'subtotal': subtotal,
-        'deliveryFee': deliveryFee,
-        'discount': _discount,
-        'total': total,
-        'promoCode': _appliedPromo?.code,
-      },
-    );
+    _handleCheckout(subtotal, total);
+  }
+
+  /// Ensures the user is authenticated before navigating to the checkout
+  Future<void> _handleCheckout(double subtotal, double total) async {
+    final auth = ref.read(firebaseAuthProvider);
+
+    // Require sign-in first
+    if (auth.currentUser == null) {
+      final goSignIn = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Sign in required'),
+          content: const Text('Please sign in to proceed to checkout.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Sign In'),
+            ),
+          ],
+        ),
+      );
+
+      if (goSignIn == true && context.mounted) {
+        Navigator.pushNamed(context, '/signin');
+      }
+      return;
+    }
+
+    // User is authenticated – navigate to checkout
+    if (context.mounted) {
+      Navigator.pushNamed(
+        context,
+        '/checkout',
+        arguments: {
+          'subtotal': subtotal,
+          'deliveryFee': deliveryFee,
+          'discount': _discount,
+          'total': total,
+          'promoCode': _appliedPromo?.code,
+        },
+      );
+    }
   }
 }
