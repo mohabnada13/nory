@@ -182,7 +182,7 @@ class ProfileScreen extends ConsumerWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppPalette.primaryStart.withOpacity(0.1),
+              color: AppPalette.primaryStart.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: user.photoURL != null
@@ -262,23 +262,25 @@ class ProfileScreen extends ConsumerWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    return GlassCard(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(icon, color: AppPalette.primaryStart),
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: AppPalette.textPrimary,
-              ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GlassCard(
+        child: ListTile(
+          leading: Icon(icon, color: AppPalette.primaryStart),
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: AppPalette.textPrimary,
+                ),
+          ),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: Colors.grey,
+          ),
+          onTap: onTap,
         ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: Colors.grey,
-        ),
-        onTap: onTap,
       ),
     );
   }

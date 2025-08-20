@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white.withOpacity(0.85),
+        backgroundColor: Colors.white.withValues(alpha: 0.85),
         selectedItemColor: AppPalette.primaryStart,
         unselectedItemColor: Colors.black38,
         items: const [
@@ -153,11 +153,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   'Featured',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: brown,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppPalette.textPrimary,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
@@ -167,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: 5,
                     itemBuilder: (context, index) {
                       return GlassCard(
-                        overlayColor: Colors.white.withOpacity(0.15),
+                        overlayColor: Colors.white.withValues(alpha: 0.15),
                         padding: const EdgeInsets.all(16),
                         borderRadius: 20,
                         child: Column(
@@ -221,11 +220,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   'Categories',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: brown,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppPalette.textPrimary,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
@@ -275,11 +273,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   'Trending Now',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: brown,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppPalette.textPrimary,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 GridView.builder(
@@ -302,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: AppPalette.accentLilac.withOpacity(0.6),
+                                color: AppPalette.accentLilac.withValues(alpha: 0.6),
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                               ),
                               child: Center(

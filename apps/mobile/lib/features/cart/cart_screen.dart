@@ -215,7 +215,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               // Quantity controls
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppPalette.primaryStart.withOpacity(0.25)),
+                  border: Border.all(
+                    color: AppPalette.primaryStart.withValues(alpha: 0.25),
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

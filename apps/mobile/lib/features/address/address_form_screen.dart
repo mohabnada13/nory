@@ -250,7 +250,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                               });
                             },
                             activeColor: AppPalette.primaryStart,
-                            activeTrackColor: AppPalette.primaryEnd.withOpacity(0.5),
+                            activeTrackColor: AppPalette.primaryEnd.withValues(alpha: 0.5),
                           ),
                         ],
                       ),
@@ -271,7 +271,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
             // Loading overlay
             if (_isLoading)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 child: Center(
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
@@ -326,10 +326,10 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
               color: AppPalette.textSecondary,
             ),
         hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppPalette.textSecondary.withOpacity(0.7),
+              color: AppPalette.textSecondary.withValues(alpha: 0.7),
             ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.7),
+        fillColor: Colors.white.withValues(alpha: 0.7),
       ),
       style: Theme.of(context).textTheme.bodyMedium,
       keyboardType: keyboardType,

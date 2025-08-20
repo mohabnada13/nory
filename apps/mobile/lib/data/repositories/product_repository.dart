@@ -51,7 +51,7 @@ class ProductRepository {
       // This is a simple implementation - in production you would use
       // a more sophisticated search approach like Algolia or Firebase Extensions
       query = query.where('name', isGreaterThanOrEqualTo: search)
-          .where('name', isLessThanOrEqualTo: search + '\uf8ff');
+          .where('name', isLessThanOrEqualTo: '$search\uf8ff');
     }
 
     // Sort by trending score descending, then by name

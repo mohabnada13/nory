@@ -25,7 +25,9 @@ class ProductDetailsScreen extends ConsumerWidget {
         elevation: 0,
         iconTheme: IconThemeData(color: AppPalette.white),
         title: Text(
-          product.name.length > 15 ? product.name.substring(0, 15) + '...' : product.name,
+          product.name.length > 15
+              ? '${product.name.substring(0, 15)}...'
+              : product.name,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: AppPalette.white,
             fontWeight: FontWeight.bold,
@@ -53,7 +55,7 @@ class ProductDetailsScreen extends ConsumerWidget {
                     width: double.infinity,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Container(
-                      color: AppPalette.accentLilac.withOpacity(0.3),
+                      color: AppPalette.accentLilac.withValues(alpha: 0.3),
                       child: Center(
                         child: CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(AppPalette.primaryStart),
@@ -61,7 +63,7 @@ class ProductDetailsScreen extends ConsumerWidget {
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(
-                      color: AppPalette.accentLilac.withOpacity(0.3),
+                      color: AppPalette.accentLilac.withValues(alpha: 0.3),
                       child: Icon(
                         Icons.bakery_dining,
                         size: 80,
@@ -89,13 +91,13 @@ class ProductDetailsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Promoted chip (if featured)
-                        if (product.isFeatured ?? false)
+                        if (product.isFeatured)
                           Align(
                             alignment: Alignment.topRight,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: AppPalette.primaryEnd.withOpacity(0.15),
+                                color: AppPalette.primaryEnd.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Text(
@@ -107,6 +109,7 @@ class ProductDetailsScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
+
                         
                         // Product title
                         Text(
@@ -158,7 +161,7 @@ class ProductDetailsScreen extends ConsumerWidget {
                         const SizedBox(height: 8),
                         
                         // Ingredients
-                        if (product.ingredients != null && product.ingredients!.isNotEmpty)
+                        if (product.ingredients.isNotEmpty)
                           Text(
                             'Ingredients: ${product.ingredients}',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(

@@ -200,12 +200,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                 borderSide: BorderSide(color: AppPalette.primaryStart, width: 2),
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.7),
+                              fillColor: Colors.white.withValues(alpha: 0.7),
                               labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: AppPalette.textSecondary,
                                   ),
                               hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppPalette.textSecondary.withOpacity(0.7),
+                                    color: AppPalette.textSecondary.withValues(alpha: 0.7),
                                   ),
                             ),
                             style: Theme.of(context).textTheme.bodyMedium,
@@ -237,12 +237,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                 borderSide: BorderSide(color: AppPalette.primaryStart, width: 2),
                               ),
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.7),
+                              fillColor: Colors.white.withValues(alpha: 0.7),
                               labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: AppPalette.textSecondary,
                                   ),
                               hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppPalette.textSecondary.withOpacity(0.7),
+                                    color: AppPalette.textSecondary.withValues(alpha: 0.7),
                                   ),
                             ),
                             style: Theme.of(context).textTheme.bodyMedium,

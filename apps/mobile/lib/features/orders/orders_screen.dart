@@ -99,9 +99,10 @@ class OrdersScreen extends ConsumerWidget {
     
     return GestureDetector(
       onTap: () => _showOrderDetails(context, order),
-      child: GlassCard(
-        margin: const EdgeInsets.only(bottom: 16),
-        child: Column(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: GlassCard(
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Order header with ID and date
@@ -192,7 +193,8 @@ class OrdersScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildStatusChip(BuildContext context, OrderStatus status) {
@@ -221,9 +223,9 @@ class OrdersScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: chipColor.withOpacity(0.1),
+        color: chipColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: chipColor.withOpacity(0.5)),
+        border: Border.all(color: chipColor.withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -268,9 +270,9 @@ class OrdersScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: chipColor.withOpacity(0.1),
+        color: chipColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: chipColor.withOpacity(0.5)),
+        border: Border.all(color: chipColor.withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -517,10 +519,11 @@ class OrderDetailsSheet extends StatelessWidget {
   }
 
   Widget _buildOrderItem(BuildContext context, OrderItem item) {
-    return GlassCard(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      child: Row(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        padding: const EdgeInsets.all(12),
+        child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Product image
@@ -574,7 +577,8 @@ class OrderDetailsSheet extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildAddressCard(BuildContext context, Address address) {
@@ -686,9 +690,9 @@ class OrderDetailsSheet extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: statusColor.withOpacity(0.5)),
+              border: Border.all(color: statusColor.withValues(alpha: 0.5)),
             ),
             child: Text(
               statusText,
